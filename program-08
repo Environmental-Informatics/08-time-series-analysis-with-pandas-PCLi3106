@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Author: Pin-Ching Li (li3106)
+This code is created on 04/08/2020
+This code aims to read the wabash daily discharge file
+from 03/17/2015 to 03/24/2016 and store it as a dataframe
+Output file is named as 'lab08.pdf' contains three plots:
+    daily average, 10 largest daily, monthly averaged streamflow plot
+"""
+
+# import modules for following application
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+
+# load wabash discharge (it's instantaneous data)
+Dis_W_raw = pd.read_csv('WabashRiver_DailyDischarge_20150317-20160324.txt',sep="\s+",skiprows=25)
+# transfer string to datetime
+Time_str = Dis_W_raw.iloc[:,1]+' '+Dis_W_raw.iloc[:,2]
+Time = pd.to_datetime(Time_str, format='%Y-%m-%d %H:%M', errors='ignore')
+# create a new dataframe with Time and discharge
+Dis_W  = pd.DataFrame(Dis_W_raw.iloc[:,4].tolist(),columns=['Discharge'],index=Time)
+# daily average of timeseries
+DailyD_W = Dis_W.resample('D').mean()
+# Maximum value (top 10) in Daily series
+DailyMax = DailyD_W.nlargest(10,columns=['Discharge'])
+# monthly average of timeseries
+MonthD_W = Dis_W.resample('M').mean()
+
+# Draw plots in pdf
+pp = PdfPages('lab08.pdf')
+
+# Draw daily series
+plt.plot(DailyD_W.index,DailyD_W.Discharge)
+plt.title('Daily Discharge of Wabash River \n From 2015/03/17 to 2016/03/24')
+plt.xlabel('Datetime')
+plt.ylabel('Discharge (cfs)')
+# save to pdf
+pp.savefig(papertype = 'a4')
+plt.close()
+
+# Draw 10 days with highest daily streamflow
+plt.scatter(DailyMax.index,DailyMax.Discharge)
+plt.title('Max 10 Daily Discharge of Wabash River \n From 2015/03/17 to 2016/03/24')
+plt.xlabel('Datetime')
+plt.ylabel('Discharge (cfs)')
+# save to pdf
+pp.savefig(papertype = 'a4')
+plt.close()
+
+
+# Draw monthly averaged streamflow
+plt.plot(MonthD_W.index,MonthD_W.Discharge)
+plt.title('Monthly Discharge of Wabash River \n From 2015/03/17 to 2016/03/24')
+plt.xlabel('Datetime')
+plt.ylabel('Discharge (cfs)')
+
+# split plots in case they are overlapped
+plt.tight_layout()
+# save to pdf 
+pp.savefig(papertype = 'a4')
+plt.close()
+# close file
+pp.close()
