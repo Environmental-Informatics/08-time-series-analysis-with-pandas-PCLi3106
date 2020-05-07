@@ -28,6 +28,9 @@ dates = pd.date_range('1950-01', periods=ao.shape[0], freq='M')
 AO = Series(ao[:,2], index=dates)
 # plot the monthly timeseries with time as x axis and value as y axis
 AO.plot()
+plt.xlabel('year')
+plt.ylabel('Daily AO')
+plt.savefig('Daily_Atlantic_Oscillation.png')
 plt.show()
 
 # plot AO value from 1980 to 1990
@@ -47,8 +50,14 @@ aonao = DataFrame({'AO' : AO, 'NAO' : NAO})
 # plot the annual median value of AO
 AO_mm = AO.resample("A").median()
 AO_mm.plot()
+plt.xlabel('year')
+plt.ylabel('Annual Median AO')
+plt.savefig('Annual_Median_values_for_AO.png')
 plt.show()
 
 # plot the Rolling mean for both AO and NAO 
 aonao.rolling(window=12, center=False).mean().plot()
+plt.xlabel('year')
+plt.ylabel('Rolling Mean')
+plt.savefig('Rolling_Mean_for_AO_NAO.png')
 plt.show()
